@@ -1,10 +1,10 @@
 select *
-from ProfolioProject.dbo.NashvilleHousing
+from PortfolioProject.dbo.NashvilleHousing
 
 -- Standardize Date Format
 
 select SaleDateConverted, CONVERT(Date,SaleDate)
-from ProfolioProject.dbo.NashvilleHousing
+from PortfolioProject.dbo.NashvilleHousing
 
 Update NashvilleHousing
 Set SaleDate = CONVERT(Date,SaleDate)
@@ -18,21 +18,21 @@ Set SaleDateConverted = Convert(Date,SaleDate)
 -- Populate Property Address data
 
 select *
-from ProfolioProject.dbo.NashvilleHousing
+from PortfolioProject.dbo.NashvilleHousing
 where PropertyAddress is null
 order by ParcelID
 
 select a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, ISNULL(a.PropertyAddress, b.PropertyAddress)
-from ProfolioProject.dbo.NashvilleHousing a
-Join ProfolioProject.dbo.NashvilleHousing b
+from PortfolioProject.dbo.NashvilleHousing a
+Join PortfolioProject.dbo.NashvilleHousing b
      on a.ParcelID = b.ParcelID
 	 And a.[UniqueID ] <> b.[UniqueID ]
 Where a.PropertyAddress is null
 
 Update a
 Set PropertyAddress = ISNULL(a.PropertyAddress, b.PropertyAddress)
-from ProfolioProject.dbo.NashvilleHousing a
-Join ProfolioProject.dbo.NashvilleHousing b
+from PortfolioProject.dbo.NashvilleHousing a
+Join PortfolioProject.dbo.NashvilleHousing b
      on a.ParcelID = b.ParcelID
 	 And a.[UniqueID ] <> b.[UniqueID ]
 Where a.PropertyAddress is null
@@ -41,14 +41,14 @@ Where a.PropertyAddress is null
 -- Breaking out Address into Individual Columns (Address, City, State)
 
 select  PropertyAddress
-from ProfolioProject.dbo.NashvilleHousing
+from PortfolioProject.dbo.NashvilleHousing
 --where PropertyAddress is null
 --order by ParcelID
 
 select 
 SUBSTRING(PropertyAddress, 1, CHARINDEX(',', PropertyAddress)-1 ) as Address
 , SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress)+1, LEN(propertyAddress)) as Address
-From ProfolioProject.dbo.NashvilleHousing
+From PortfolioProject.dbo.NashvilleHousing
 
 Alter Table NashvilleHousing
 Add PropertySplitAddress Nvarchar(255);
@@ -63,17 +63,17 @@ Update NashvilleHousing
 Set PropertySplitCity = SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress)+1, LEN(propertyAddress))
 
 select *
-from ProfolioProject.dbo.NashvilleHousing
+from PortfolioProject.dbo.NashvilleHousing
 
 
 select OwnerAddress
-from ProfolioProject.dbo.NashvilleHousing
+from PortfolioProject.dbo.NashvilleHousing
 
 Select
 PARSENAME(Replace(OwnerAddress, ',', '.'), 3)
 ,PARSENAME(Replace(OwnerAddress, ',', '.'), 2)
 ,PARSENAME(Replace(OwnerAddress, ',', '.'), 1)
-from ProfolioProject.dbo.NashvilleHousing
+from PortfolioProject.dbo.NashvilleHousing
 
 
 Alter Table NashvilleHousing
@@ -98,7 +98,7 @@ Set OwnerSplitState = PARSENAME(Replace(OwnerAddress, ',', '.'), 1)
 -- Change Y and N to Yes and No in "Sold as Vacant" field
 
 Select Distinct(SoldAsVacant), Count(SoldAsVacant)
-From ProfolioProject.dbo.NashvilleHousing
+From PortfolioProject.dbo.NashvilleHousing
 Group by SoldAsVacant
 order by 2
 
@@ -107,7 +107,7 @@ Select SoldAsVacant
        When SoldAsVacant = 'N' THEN 'No'
 	   ELSE SoldAsVacant
 	   END
-From ProfolioProject.dbo.NashvilleHousing
+From PortfolioProject.dbo.NashvilleHousing
 
 Update NashvilleHousing
 Set SoldAsVacant = CASE When SoldAsVacant = 'Y' THEN 'Yes'
@@ -130,7 +130,7 @@ Select *,
 				     UniqueID
 					 ) row_num
 
-From ProfolioProject.dbo.NashvilleHousing
+From PortfolioProject.dbo.NashvilleHousing
 )
 Select *
 From RowNumCTE
@@ -140,8 +140,8 @@ Order by PropertyAddress
 
 -- Delete Unused Columns
 
-ALTER TABLE ProfolioProject.dbo.NashvilleHousing
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
 DROP COLUMN OwnerAddress, TaxDistrict, PropertyAddress
 
-ALTER TABLE ProfolioProject.dbo.NashvilleHousing
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
 DROP COLUMN SaleDate
